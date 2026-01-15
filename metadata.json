@@ -1,0 +1,8 @@
+{
+  "name": "Commission-Killer by GreenNova AI",
+  "description": "A high-performance financial shield for South African restaurants to reclaim profits from 30% app commissions through branded direct-ordering, AI-powered marketing, and instant payouts.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
