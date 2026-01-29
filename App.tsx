@@ -11,6 +11,7 @@ import LeadForm from './components/LeadForm';
 import WhatsAppWidget from './components/WhatsAppWidget';
 import AiChatbot from './components/AiChatbot';
 import ArticleView from './components/ArticleView';
+import DemoPage from './components/DemoPage';
 import ReferralDashboard from './components/ReferralDashboard';
 import LiveOrderSimulator from './components/LiveOrderSimulator';
 import SavingsDashboardHero from './components/SavingsDashboardHero';
@@ -39,7 +40,8 @@ import {
   WifiOff,
   DollarSign,
   ArrowRight,
-  Globe
+  Globe,
+  Calendar
 } from 'lucide-react';
 
 const App: React.FC = () => {
@@ -47,6 +49,7 @@ const App: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [currentArticle, setCurrentArticle] = useState<Article | null>(null);
+  const [isDemoPage, setIsDemoPage] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
 
   const blogArticles: Article[] = [
@@ -120,10 +123,16 @@ const App: React.FC = () => {
         const article = blogArticles.find(a => a.id === id);
         if (article) {
           setCurrentArticle(article);
+          setIsDemoPage(false);
           window.scrollTo(0, 0);
         }
+      } else if (hash === '#demo') {
+        setIsDemoPage(true);
+        setCurrentArticle(null);
+        window.scrollTo(0, 0);
       } else {
         setCurrentArticle(null);
+        setIsDemoPage(false);
       }
     };
 
@@ -161,7 +170,11 @@ const App: React.FC = () => {
     window.location.hash = `#blog/${id}`;
   };
 
-  const closeArticle = () => {
+  const navigateToDemo = () => {
+    window.location.hash = '#demo';
+  };
+
+  const closeView = () => {
     window.location.hash = '';
   };
 
@@ -178,8 +191,8 @@ const App: React.FC = () => {
   };
 
   const scrollTo = (id: string) => {
-    if (currentArticle) {
-      closeArticle();
+    if (currentArticle || isDemoPage) {
+      closeView();
       setTimeout(() => {
         const element = document.getElementById(id);
         if (element) {
@@ -210,9 +223,9 @@ const App: React.FC = () => {
       <AiChatbot />
       <WhatsAppWidget />
 
-      <nav className={`fixed w-full z-[120] transition-all duration-500 ${isScrolled || currentArticle ? 'glass py-3 shadow-2xl border-b border-emerald-100/20' : 'bg-transparent py-8'}`}>
+      <nav className={`fixed w-full z-[120] transition-all duration-500 ${isScrolled || currentArticle || isDemoPage ? 'glass py-3 shadow-2xl border-b border-emerald-100/20' : 'bg-transparent py-8'}`}>
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-          <div className="flex items-center gap-4 cursor-pointer group" onClick={() => { if (currentArticle) closeArticle(); else window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+          <div className="flex items-center gap-4 cursor-pointer group" onClick={() => { if (currentArticle || isDemoPage) closeView(); else window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
             <div className="w-12 h-12 md:w-14 md:h-14 flex items-center justify-center bg-[#F8FAFC] dark:bg-[#212529] rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800 p-2 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 animate-logo-glow animate-border-pulse">
               <img src="logo.png" alt="GreenNova Logo" className="w-full h-full object-contain" />
             </div>
@@ -228,7 +241,10 @@ const App: React.FC = () => {
               <Gift size={14} className="text-emerald-500" />
               Referral Program
             </button>
-            <button onClick={() => scrollTo('testimonials')} className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Testimonials</button>
+            <button onClick={navigateToDemo} className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors flex items-center gap-2">
+              <Calendar size={14} className="text-emerald-500" />
+              Schedule Demo
+            </button>
             <button onClick={() => scrollTo('resources')} className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Resources Hub</button>
             <div className="h-6 w-px bg-slate-200 dark:bg-slate-800 mx-2"></div>
             <button 
@@ -239,7 +255,7 @@ const App: React.FC = () => {
               {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
             </button>
             <button 
-              onClick={() => scrollTo('book-demo')}
+              onClick={navigateToDemo}
               className="bg-slate-900 dark:bg-emerald-600 text-white px-8 py-4 rounded-2xl hover:bg-emerald-600 dark:hover:bg-emerald-500 transition-all shadow-2xl hover:shadow-emerald-100 dark:hover:shadow-emerald-900 hover:-translate-y-1"
             >
               Start Recovery
@@ -259,7 +275,9 @@ const App: React.FC = () => {
 
       <main>
         {currentArticle ? (
-          <ArticleView article={currentArticle} onBack={closeArticle} onAction={() => scrollTo('book-demo')} />
+          <ArticleView article={currentArticle} onBack={closeView} onAction={navigateToDemo} />
+        ) : isDemoPage ? (
+          <DemoPage onBack={closeView} />
         ) : (
           <>
             <Hero onSecondaryClick={() => scrollTo('calculator')} />
@@ -370,7 +388,7 @@ const App: React.FC = () => {
                 <h2 className="text-5xl md:text-8xl font-black mb-14 tracking-tighter leading-[0.9]">It’s not a website. <br/> It’s a Financial Shield.</h2>
                 <p className="text-xl md:text-3xl text-emerald-50 mb-20 leading-relaxed font-medium max-w-5xl mx-auto">Stop donating your margins to big tech giants.</p>
                 <div className="flex flex-col items-center">
-                  <button onClick={() => scrollTo('book-demo')} className="group shimmer relative px-12 md:px-24 py-8 md:py-12 bg-white text-emerald-950 rounded-[48px] md:rounded-[64px] font-black text-2xl md:text-4xl hover:bg-emerald-50 transition-all shadow-2xl hover:scale-105 active:scale-95 mb-16 overflow-hidden">
+                  <button onClick={navigateToDemo} className="group shimmer relative px-12 md:px-24 py-8 md:py-12 bg-white text-emerald-950 rounded-[48px] md:rounded-[64px] font-black text-2xl md:text-4xl hover:bg-emerald-50 transition-all shadow-2xl hover:scale-105 active:scale-95 mb-16 overflow-hidden">
                     <span className="relative z-10 flex items-center gap-6">Launch My Commission-Killer System Today<ArrowUpRight size={40} strokeWidth={3} /></span>
                   </button>
                 </div>

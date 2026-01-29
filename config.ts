@@ -14,7 +14,7 @@ export const CONFIG = {
   contact: {
     // IMPORTANT: Replace this with your actual WhatsApp number (include country code, no +)
     // Example: "27821234567"
-    whatsappNumber: "27820000000", 
+    whatsappNumber: "27684265339", 
     email: "hello@greennova.ai",
     location: "South Africa",
   },

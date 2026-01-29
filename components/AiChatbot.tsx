@@ -85,7 +85,11 @@ const AiChatbot: React.FC = () => {
           {/* Messages */}
           <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/50 dark:bg-slate-900/50 scroll-smooth">
             {messages.map((m, i) => (
-              <div key={i} className={`flex gap-3 ${m.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+              <div 
+                key={i} 
+                className={`flex gap-3 ${m.role === 'user' ? 'flex-row-reverse' : 'flex-row'} animate-in fade-in slide-in-from-bottom-2 duration-500`}
+                style={{ animationDelay: `${i === 0 ? 400 : 0}ms`, animationFillMode: 'backwards' }}
+              >
                 {m.role === 'model' && (
                   <div className="w-9 h-9 rounded-xl overflow-hidden bg-white shadow-sm shrink-0 border border-emerald-500/20 mt-1 flex items-center justify-center p-1">
                     <img src={logoAvatar} alt="Logo" className="w-full h-full object-contain" />
@@ -179,7 +183,7 @@ const AiChatbot: React.FC = () => {
             </div>
             <div className="absolute -top-1 -right-1 flex items-center justify-center">
               <span className="w-5 h-5 bg-emerald-500 border-4 border-white dark:border-slate-900 rounded-full animate-pulse flex items-center justify-center">
-                <Sparkles size={8} className="text-white fill-current" />
+                <Sparkles size={8} className="text-white fill-current animate-[spin_4s_linear_infinite]" />
               </span>
             </div>
           </div>

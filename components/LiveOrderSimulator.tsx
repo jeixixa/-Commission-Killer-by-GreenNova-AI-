@@ -1,11 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
-import { Bell, Smartphone, MessageCircle, Check, ArrowRight, Zap, ShoppingCart } from 'lucide-react';
+import { Bell, Smartphone, MessageCircle, Check, ArrowRight, Zap, ShoppingCart, History } from 'lucide-react';
 import { generateWhatsAppOrderLink, OrderDetails } from '../services/notificationService';
 
 const LiveOrderSimulator: React.FC = () => {
   const [showNotification, setShowNotification] = useState(false);
   const [activeOrder, setActiveOrder] = useState<OrderDetails | null>(null);
+  const [orderHistory, setOrderHistory] = useState<OrderDetails[]>([]);
 
   const simulateOrder = () => {
     const dummyOrder: OrderDetails = {
@@ -22,10 +23,16 @@ const LiveOrderSimulator: React.FC = () => {
     };
 
     setActiveOrder(dummyOrder);
+    setOrderHistory(prev => [dummyOrder, ...prev].slice(0, 5));
     setShowNotification(true);
     
     // Auto-hide UI notification after 10 seconds
     setTimeout(() => setShowNotification(false), 10000);
+  };
+
+  const viewHistoryDetail = (order: OrderDetails) => {
+    setActiveOrder(order);
+    setShowNotification(true);
   };
 
   return (
@@ -80,7 +87,8 @@ const LiveOrderSimulator: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="flex-1 px-4 space-y-4">
+                <div className="flex-1 px-4 space-y-4 overflow-y-auto custom-scrollbar pb-10">
+                  {/* Current Active Orders Simulated List */}
                   <div className="p-5 bg-slate-900/50 rounded-3xl border border-white/5 opacity-50">
                     <div className="flex justify-between mb-2">
                       <span className="text-[10px] font-black text-slate-500">#GN-9021</span>
@@ -95,6 +103,33 @@ const LiveOrderSimulator: React.FC = () => {
                     </div>
                     <p className="text-white font-bold text-sm">1x Vegan Wrap</p>
                   </div>
+
+                  {/* Order History Section */}
+                  {orderHistory.length > 0 && (
+                    <div className="pt-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                      <div className="flex items-center gap-2 px-2 mb-4">
+                        <History size={12} className="text-slate-500" />
+                        <h5 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Recent History</h5>
+                      </div>
+                      <div className="space-y-3">
+                        {orderHistory.map((order) => (
+                          <button 
+                            key={order.id}
+                            onClick={() => viewHistoryDetail(order)}
+                            className="w-full text-left p-4 bg-white/5 hover:bg-white/10 rounded-2xl border border-white/5 transition-all group/hist"
+                          >
+                            <div className="flex justify-between items-center">
+                              <span className="text-[10px] font-black text-emerald-400">#{order.id}</span>
+                              <span className="text-[9px] font-bold text-slate-500">R{order.total}</span>
+                            </div>
+                            <p className="text-slate-300 text-[11px] font-bold truncate mt-1 group-hover/hist:text-white transition-colors">
+                              {order.items.map(i => `${i.quantity}x ${i.name}`).join(', ')}
+                            </p>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Simulated Notification Toast */}
@@ -104,10 +139,15 @@ const LiveOrderSimulator: React.FC = () => {
                       <div className="w-12 h-12 bg-emerald-600 rounded-2xl flex items-center justify-center shrink-0">
                         <MessageCircle size={24} className="text-white" fill="currentColor" />
                       </div>
-                      <div className="flex-1">
+                      <div className="flex-1 min-w-0">
                         <div className="flex justify-between items-start mb-1">
                           <p className="text-[10px] font-black text-emerald-600 uppercase">WhatsApp • Now</p>
-                          <span className="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></span>
+                          <button 
+                            onClick={() => setShowNotification(false)}
+                            className="text-slate-300 hover:text-slate-900 transition-colors"
+                          >
+                            <Check size={14} />
+                          </button>
                         </div>
                         <p className="text-slate-900 font-black text-sm mb-1 leading-tight">NEW ORDER: #{activeOrder.id}</p>
                         <p className="text-slate-500 text-xs font-bold truncate">R{activeOrder.total} Paid - {activeOrder.customerName}</p>
@@ -128,7 +168,7 @@ const LiveOrderSimulator: React.FC = () => {
             </div>
 
             {/* Float Labels */}
-            <div className="absolute -right-12 top-1/4 bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 animate-float">
+            <div className="absolute -right-12 top-1/4 bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 animate-float hidden md:block">
                <div className="flex items-center gap-3 mb-2">
                   <Check className="text-emerald-500" size={18} strokeWidth={4} />
                   <span className="font-black text-xs dark:text-white">Customer Paid</span>
@@ -138,6 +178,11 @@ const LiveOrderSimulator: React.FC = () => {
           </div>
         </div>
       </div>
+      <style>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 0px;
+        }
+      `}</style>
     </section>
   );
 };
